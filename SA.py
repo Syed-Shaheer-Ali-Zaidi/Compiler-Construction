@@ -14,68 +14,139 @@ def const(i):
         return i, True
     if (TS[i][0] == "LOGICCONST"):
         return i, True
-    return i, False
+    print("Invalid Constant at ", TS[i][1], " in line number ", TS[i][2])
+    return i, False 
     
 
 def list2(i):
     if (TS[i][0] == ";"):
-        return True
-    if (TS[i][0] == ","):
+        return i, True
+    if (TS[i][0] == "comma"):
         i+=1
         if (TS[i][0] == "ID"):
             i+=1
-            if (list(i)):
-                return True
-    return False
+            if (TS[i][0] == "comma" or TS[i][0] == ";" or TS[i][0] == "SAO"):
+                i, listLogic = list(i)
+                if (listLogic):
+                    return i, True
+                else:
+                    return i, False
+            else:
+                print("Error, expected a , or ; or = at ", TS[i][1], " in line number ", TS[i][2])
+                return i, False
+        else:
+            print("Error, expected an identifier at ", TS[i][1], " in line number ", TS[i][2])
+            return i, False
+    else:
+        print("Error, expected a ; or , at ", TS[i][2], " in line number ", TS[i][2])
+        return i, False
 
 def init(i):
     if (TS[i][0] == "ID"):
         i+=1
-        if(list(i)):
-            return True
-    i, const_logic = const(i)
-    if (const_logic):
-        i+=1
-        if(list2(i)):
-            return True
-    return False
+        if (TS[i][0] == "comma" or TS[i][0] == ";" or TS[i][0] == "SAO"):
+            i, listLogic = list(i)
+            if(listLogic):
+                return i, True
+            else:
+                return i, False
+        else:
+            print("Error, expected a , or ; or = at ", TS[i][1], " in line number ", TS[i][2])
+            return i, False
+    if(TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
+        i, const_logic = const(i)
+        if (const_logic):
+            i+=1
+            if (TS[i][0] == ";" or TS[i][0] == "comma"):
+                i, list2Logic = list2(i)
+                if(list2Logic):
+                    return i, True
+                else:
+                    return i, False
+            else:
+                print("Error, expected a , or ; at ", TS[i][1], " in line number ", TS[i][2])
+        else:
+            return i, False
+    else:
+        print("Error, expected an identifier or constant at ", TS[i][1], " in line number ", TS[i][2])
+        return i, False
 
 
 def list(i):
-    if (TS[i][0] == ","):
+    if (TS[i][0] == "comma"):
         i+=1
         if (TS[i][0] == "ID"):
             i+=1
-            if(list(i)):
-                return True
+            if (TS[i][0] == "comma" or TS[i][0] == ";" or TS[i][0] == "SAO"):
+                i, listLogic = list(i)
+                if(listLogic):
+                    return i, True
+                else:
+                    return i, False
+            else:
+                print("Error, expected , or ; or = at ", TS[i][1], " in line number ", TS[i][2])
+                return i, False
+        else:
+            print("Error, expected an identifier at ", TS[i][1], " in line number ", TS[i][2])
+            return i, False
     elif (TS[i][0] == ";"):
-        return True
+        return i, True
     elif (TS[i][0] == "SAO"):
         i+=1
-        if(init(i)):
-            return True
-    return False
+        if (TS[i][0] == "ID" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
+            i, initLogic = init(i)
+            if(initLogic):
+                return i, True
+            else:
+                return i, False
+        else:
+            print("Error, expected an identifier or constant at ", TS[i][1], " at line number ", TS[i][2])
+            return i, False
+    else:
+        print("Error, expected a , or ; or = at ", TS[i][1], " in line number ", TS[i][2])
+        return i, False
 
 def Decl(i):
     if (TS[i][0] == "DT"):
         i+=1
         if (TS[i][0] == "ID"):
             i+=1
-            if(list(i)):
-                return i, True
-    return i, False
+            if (TS[i][0] == "comma" or TS[i][0] == ";" or TS[i][0] == "SAO"):
+                i, listLogic = list(i)
+                if(listLogic):
+                    return i, True
+                else:
+                    return i, False
+            else:
+                print("Error, expected , or ; or = at ", TS[i][1], " in line number ", TS[i][2])
+                return i, False
+        else:
+            print ("Error, invalid Identifier at ", TS[i][1], " in line number ", TS[i][2])
+            return i, False
+    else:
+        print ("Error, invalid DataType at ", TS[i][1], " in line number ", TS[i][2])
+        return i, False
 
 
 def new(i):
     if (TS[i][0] == "comma"):
         i+=1
-        i, OElogic = OE(i)
-        if (OElogic):
-            i+=1
-            i, newlogic = new(i)
-            if (newlogic):
-                return i, True
-    return i, True
+        if (TS[i][0]=="ID" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST" or TS[i][0] == "ORB" or TS[i][0] == "not"):
+            i, OElogic = OE(i)
+            if (OElogic):
+                i+=1
+                i, newlogic = new(i)
+                if (newlogic):
+                    return i, True
+                else:
+                    return i, False
+            else:
+                return i, False
+        else:
+            print("Error, expected an identifier or a constant or ( or ! at ", TS[i][1], " in line number ", TS[i][2])
+            return i, False
+    else:
+        return i, True
 
 def args(i):
     i, OElogic = OE(i)
@@ -606,7 +677,7 @@ def exp(i):
         return i, True
     i , IDlogic = ID(i)
     if (IDlogic):
-        return i, True
+        return i-1, True
     return False
 
 def ret(i):
@@ -614,6 +685,7 @@ def ret(i):
         i+=1
         i, expLogic = exp(i)
         if (expLogic):
+            print(TS[i][0])
             i+=1
             if (TS[i][0] == ";"):
                 return i, True
