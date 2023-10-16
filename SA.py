@@ -148,8 +148,6 @@ def Dim(i):
             i+=1
             if (TS[i][0] == "CSB"):
                 return i, True
-    elif (TS[i][0] == None):
-        return i, True
     return i, False
 
 def inc_dec(i):
@@ -654,7 +652,7 @@ def while_st(i):
             i+=1
             i, OElogic = OE(i)
             if (OElogic):
-                i+=1
+                i+=2
                 if (TS[i][0] == "CRB"):
                     i+=1
                     if (TS[i][0] == "OCB"):
@@ -664,7 +662,7 @@ def while_st(i):
                             i+=1
                             if (TS[i][0] == "CCB"):
                                 return i, True
-    return False
+    return i, False
 
 def bring_st(i):
     if (TS[i][0] == "import"):
@@ -707,7 +705,7 @@ def take(i):
                                         i+=1
                                         if (TS[i][0] == ";"):
                                             return i, True
-        return i, False
+    return i, False
 
 def arg3(i):
     i, IDlogic = ID(i)
@@ -797,7 +795,7 @@ def extract(i):
                         i+=1
                         if (TS[i][0] == ";"):
                             return i, True
-    return i, True
+    return i, False
 
 def args2(i):
     if (TS[i][0] == "comma"):
@@ -916,6 +914,7 @@ def SST(i):
     i, bring_logic = bring_st(i)
     if (bring_logic):
         return i, True
+    return i, False
     
 
 def MST(i):
@@ -937,3 +936,123 @@ def Body(i):
         return i, True
 
     return i, False
+
+def acc_mod(i):
+    if (TS[i][0] == "AM"):
+        return i+1 , True
+    return i, True
+
+def constr(i):
+        if (TS[i][0] == "init"):
+            i+=1
+            if (TS[i][0] == "ORB"):
+                i+=1
+                if (TS[i][0] == "self"):
+                    i+=1
+                    if (TS[i][0] == "comma"):
+                        i+=1
+                        i, argsClogic = argscomp(i)
+                        i+=1
+                        if (TS[i][0] == "CRB"):
+                            i+=1
+                            if (TS[i][0] == "OCB"):
+                                i+=1
+                                i, MSTlogic = MST(i)
+                                if (MSTlogic):
+                                    i+=1
+                                    if (TS[i][0] == "CCB"):
+                                        return i, True
+        return i, False
+
+def AOM(i):
+    i, accmodlogic = acc_mod(i)
+    if (accmodlogic):
+        if (TS[i][0] == "DT"):
+            i+=1
+            i, declLogic = Decl(i)
+            if (declLogic):
+                i+=1
+                i, AOMlogic = AOM(i)
+                if (AOMlogic):
+                    return i, True
+        if (TS[i][0] == "def"):
+            i+=1
+            i, funcLogic = func_def(i)
+            if(funcLogic):
+                i+=1
+                i, AOMlogic = AOM(i)
+                if(AOMlogic):
+                    return i, True
+        if (TS[i][0] == "init"):
+            i+=1
+            i, constrLogic = constr(i)
+            if (constrLogic):
+                i+=1
+                i, AOMlogic = AOM(i)
+                if(AOMlogic):
+                    return i, True
+        return i, True
+
+
+def class_decl(i):
+    if (TS[i][0] == "class"):
+        i+=1
+        if (TS[i][0] == "ID"):
+            i+=1
+            if (TS[i][0] == "OCB"):
+                i+=1
+                i, AOMlogic = AOM(i)
+                if(AOMlogic):
+                    i+=1
+                    if (TS[i][0] == "CCB"):
+                        return i+2, True
+    return i, False
+
+def inhert(i):
+    if (TS[i][0] == "class"):
+        i+=1
+        if (TS[i][0] == "ID"):
+            i+=1
+            if (TS[i][0] == "ORB"):
+                i+=1
+                if (TS[i][0] == "inheritance"):
+                    i+=1
+                    if (TS[i][0] == "SAO"):
+                        i+=1
+                        if (TS[i][0] == "ID"):
+                            i+=1
+                            if (TS[i][0] == "CRB"):
+                                i+=1
+                                if (TS[i][0] == "OCB"):
+                                    i+=1
+                                    i, AOMlogic = AOM(i)
+                                    if(AOMlogic):
+                                        i += 1
+                                        if (TS[i][0] == "CCB"):
+                                            return i+2, True
+
+def S(i):
+    i, SSTlogic = SST(i)
+    if (SSTlogic):
+        i+=1
+        i, Slogic = S(i)
+        if (Slogic):
+            return i, True
+    if (TS[i][0] == "class"):
+        i+=1
+        if (TS[i][0] == "ID"):
+            i+=1
+            i, inhertLogic = inhert(i-2)
+            if (inhertLogic):
+                i+=1
+                i, Slogic = S(i)
+                if (Slogic):
+                    return i, True 
+            i , classLogic = class_decl(i-2)
+            if (classLogic):
+                i+=1
+                i, Slogic = S(i)
+                if (Slogic):
+                    return i, True
+    return i, True
+    
