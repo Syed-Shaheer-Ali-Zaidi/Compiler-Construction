@@ -204,7 +204,7 @@ def breakWords(code):
             word = f"{code[i]}{code[i+1]}"
             word, i, current_token = generateToken(word, line, i)
             tokenList.append(current_token)
-            i += 2
+            i += 2  
             continue
 
         # single symbol word
