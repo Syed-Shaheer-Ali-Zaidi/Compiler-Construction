@@ -1,1 +1,1 @@
-shaheer = dict_of{pp:2};
+array[5]=list_of[list_of[5,6,7], 2];

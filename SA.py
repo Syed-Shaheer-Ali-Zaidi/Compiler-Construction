@@ -75,9 +75,7 @@ def new(i):
             i, newlogic = new(i)
             if (newlogic):
                 return i, True
-    elif (TS[i][0] == None):
-        return i, True
-    return i, False
+    return i, True
 
 def args(i):
     i, OElogic = OE(i)
@@ -86,9 +84,7 @@ def args(i):
         i, newlogic = new(i)
         if (newlogic):
             return i, True
-    elif (TS[i][0] == None):
-        return i, True
-    return i, False
+    return i-1, True
 
 def fn_call(i):
     i, IDlogic = ID(i)
@@ -124,9 +120,7 @@ def IDcomp(i):
                 i, IDcomplogic = IDcomp(i)
                 if (IDcomplogic):
                     return i, True
-    elif (TS[i][0] == None):
-        return i, True
-    return i, False
+    return i, True
 
 def ID(i):
     if (TS[i][0] == "ID"):
@@ -304,10 +298,7 @@ def cont(i):
                     i+=1
                     i, contlogic = cont(i)
                     if (contlogic):
-                        return i, True
-    # elif (TS[i][0] == None):
-    #     return i, True
-    
+                        return i, True  
     return i-1  , True
 
 def PMcomp(i):
@@ -319,9 +310,6 @@ def PMcomp(i):
             i, PMcomplogic = PMcomp(i)
             if (PMcomplogic):
                 return i, True
-    # elif (TS[i][0] == None):
-    #     return i, True
-
     return i-1, True
 
 def MDMcomp(i):
@@ -333,9 +321,6 @@ def MDMcomp(i):
             i, MDMcomplogic = MDMcomp(i)
             if (MDMcomplogic):
                 return i, True
-    # elif (TS[i][0] == None):
-    #     return i, True
-
     return i-1, True
 
 def REcomp(i):
@@ -347,9 +332,6 @@ def REcomp(i):
             i, REcomplogic = REcomp(i)
             if (REcomplogic):
                 return i, True
-    # elif (TS[i][0] == None):
-    #     return i, True
-
     return i-1, True            
 
 def AEcomp(i):
@@ -361,9 +343,6 @@ def AEcomp(i):
             i, AEcomplogic = AEcomp(i)
             if (AEcomplogic):
                 return i, True
-    # elif (TS[i][0] == None):
-    #     return i, True
-
     return i-1, True
 
 def OEcomp(i):
@@ -375,9 +354,6 @@ def OEcomp(i):
             i, OEcomplogic = OEcomp(i)
             if (OEcomplogic):
                 return i, True
-    # elif (TS[i][0] == None):
-    #     return i, True
-
     return i-1, True
 
 
@@ -407,6 +383,56 @@ def map_decl(i):
                                             return i, True
     return i, False
 
+def L(i):
+    i, listClogic = listComp(i)
+    if (listClogic):
+        return i, True
+    i, OElogic = OE(i)
+    if (OElogic):
+        return i, True
+    return i, False
+    
 
-i, logic = map_decl(0)
-print(logic)
+def contComp(i):
+    if (TS[i][0] == "comma"):
+        i+=1
+        i, Llogic = L(i)
+        if (Llogic):
+            i+=1
+            i, contClogic = contComp(i)
+            if (contClogic):
+                return i, True
+    return i, True
+
+def listComp(i):
+    if (TS[i][0] == "list"):
+        i+=1
+        if (TS[i][0] == "OSB"):
+            i+=1
+            i, Llogic = L(i)
+            if (Llogic):
+                i+=1
+                i, contClogic = contComp(i)
+                if (contClogic):
+                    if (TS[i][0] == "CSB"):
+                        return i, True
+    return i, False
+
+def list_decl(i):
+    if (TS[i][0] == "ID"):
+        i+=1
+        if (TS[i][0] == "OSB"):
+            i+=1
+            i, indlogic = ind(i)
+            if (indlogic):
+                i+=1
+                if (TS[i][0] == "CSB"):
+                    i+=1
+                    if (TS[i][0] == "SAO"):
+                        i+=1
+                        i, listcomp_logic = listComp(i)
+                        if (listcomp_logic):
+                            i+=1
+                            if (TS[i][0] == ";"):
+                                return i, True
+    return i, False
