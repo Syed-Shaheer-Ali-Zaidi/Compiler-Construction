@@ -204,7 +204,7 @@ def breakWords(code):
             word = f"{code[i]}{code[i+1]}"
             word, i, current_token = generateToken(word, line, i)
             tokenList.append(current_token)
-            i += 1
+            i += 2
             continue
 
         # single symbol word
@@ -266,7 +266,7 @@ def breakWords(code):
 
     return tokenList
 
-f = open('D:\\Shaheer\\Syntax Analyzer\\code.txt', 'r')
+f = open('D:\\Shaheer\\Compiler Construction\\Compiler-Construction\\code.txt', 'r')
 code = f.read()
 tokens = breakWords(code)
 print(tokens)

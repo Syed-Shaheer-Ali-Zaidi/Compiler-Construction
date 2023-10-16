@@ -1,1 +1,1 @@
-int a = 5;
+shaheer = dict_of{pp:2};
