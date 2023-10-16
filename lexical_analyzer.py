@@ -1,6 +1,6 @@
 import re
 
-kw = {"int" : "DT", "flt" : "DT", "chr" : "DT", "text" : "DT", "logic" : "DT", "list_of" : "list", "dict_of" : "map", "bring_back" : "return", "while_so" : "conditional", "given" : "conditional", "otherwise" : "else", "else_if" : "elif", "for_each" : "for", "stop" : "flow control", "go_on" : "flow control", "doing" : "def", "display" : "print", "take" : "input", "bring" : "import", "extract" : "extract", "as" : "as", "classy" : "class", "is_a" : "inheritance", "has" : "has", "init" : "init","self":"self", "base" : "base", "this" : "this", "priv" : "AM", "pro" : "AM","virtual":"AM" , "range":"range", "try":"try", "except":"except"}
+kw = {"int" : "DT", "flt" : "DT", "chr" : "DT", "text" : "DT", "logic" : "DT", "list_of" : "list", "dict_of" : "map", "bring_back" : "return", "while_so" : "conditional", "given" : "conditional", "otherwise" : "else", "else_if" : "elif", "for_each" : "for", "stop" : "flow control","$":"$", "go_on" : "flow control", "doing" : "def", "display" : "print", "take" : "input", "bring" : "import", "extract" : "extract", "as" : "as", "classy" : "class", "is_a" : "inheritance", "has" : "has", "init" : "init","self":"self", "base" : "base", "this" : "this", "priv" : "AM", "pro" : "AM","virtual":"AM" , "range":"range", "try":"try", "except":"except"}
 opr = {"+" : "AO", "-" : "AO", "*" : "AO", "/" : "AO", "%" : "AO", "**" : "AO", "==" : "RO", "!=" : "RO", "<=" : "RO", ">=" : "RO", "<" : "RO", ">" : "RO", "and" : "and", "or" : "or", "not" : "not", "=" : "SAO", "+=" : "CAO", "-=" : "CAO", "in" : "RO", "is" : "RO"}
 punc = {";" : ";", ":" : "colon", "," : "comma", "." : "dot", "(" : "ORB", ")" : "CRB", "{" : "OCB", "}" : "CCB", "[" : "OSB", "]" : "CSB", "#/" : "comment"}
 
@@ -69,6 +69,13 @@ def isPunc(word):
         return True
     else:
         return False
+    
+def isStringEnd(word):
+    temp = kw.get(word)
+    if (temp):
+        return True
+    else:
+        return False
 
 def generateToken(word, line, i):
     CP = None
@@ -89,6 +96,8 @@ def generateToken(word, line, i):
         CP = opr.get(word)
     elif(isPunc(word)):
         CP = punc.get(word)
+    elif(isStringEnd(word)):
+        CP="$"
     else:
         CP = "Invalid_Lexeme"
 

@@ -991,7 +991,7 @@ def AOM(i):
                 i, AOMlogic = AOM(i)
                 if(AOMlogic):
                     return i, True
-        return i, True
+        return i-1, True
 
 
 def class_decl(i):
@@ -1030,31 +1030,33 @@ def inhert(i):
                                         i += 1
                                         if (TS[i][0] == "CCB"):
                                             return i+2, True
+    return i, False
 
 def S(i):
-    i, SSTlogic = SST(i)
-    if (SSTlogic):
-        i+=1
-        i, Slogic = S(i)
-        if (Slogic):
-            return i, True
+    if (TS[i][0] == "$"):
+        return i, True
     if (TS[i][0] == "class"):
         i+=1
         if (TS[i][0] == "ID"):
             i+=1
+            i, classLogic = class_decl(i-2)
             i, inhertLogic = inhert(i-2)
-            if (inhertLogic):
+            if (inhertLogic or classLogic):
                 i+=1
                 i, Slogic = S(i)
-                if (Slogic):
-                    return i, True 
-            i , classLogic = class_decl(i-2)
-            if (classLogic):
-                i+=1
-                i, Slogic = S(i)
-                if (Slogic):
-                    return i, True
-    return i, True
+                return i, Slogic
+            else:
+                return i, False
+        else:
+            return i, False
+    else:
+        i, SSTlogic = SST(i)
+        if (SSTlogic):
+            i+=1
+            i, Slogic = S(i)
+            return i, Slogic
+        else:
+            return i, False
 
 i, logic = S(0)
 print (logic)
