@@ -1055,4 +1055,6 @@ def S(i):
                 if (Slogic):
                     return i, True
     return i, True
-    
+
+i, logic = S(0)
+print (logic)
