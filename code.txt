@@ -1,1 +1,1 @@
-array[5]=list_of[list_of[5,6,7], 2];
+"Enter number of people"

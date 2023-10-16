@@ -62,8 +62,8 @@ def Decl(i):
         if (TS[i][0] == "ID"):
             i+=1
             if(list(i)):
-                return True
-    return False
+                return i, True
+    return i, False
 
 
 def new(i):
@@ -435,4 +435,505 @@ def list_decl(i):
                             i+=1
                             if (TS[i][0] == ";"):
                                 return i, True
+    return i, False
+
+def cond(i):
+    i, OElogic = OE(i)
+    if (OElogic):
+        return i, True
+    return i, True
+
+def if_func(i):
+    if (TS[i][0] == "conditional"):
+        i+=1
+        if (TS[i][0] == "ORB"):
+            i+=1
+            i, OElogic = OE(i)
+            if (OElogic):
+                i+=1
+                if (TS[i][0] == "CRB"):
+                    i+=1
+                    if (TS[i][0] == "OCB"):
+                        i+=1
+                        i, bodylogic = Body(i)
+                        if (bodylogic):
+                            i+=1
+                            if (TS[i][0] == "CCB"):
+                                return i, True
+    return i, False
+
+def if_else(i):
+    i, iflogic = if_func(i)
+    if (iflogic):
+        i+=1
+        if (TS[i][0] == "else"):
+            i+=1
+            if (TS[i][0] == "ORB"):
+                i+=1
+                i, condLogic = cond(i)
+                if(condLogic):
+                    i+=1
+                    if (TS[i][0] == "CRB"):
+                        i+=1
+                        if (TS[i][0] == "OCB"):
+                            i+=1
+                            i, bodylogic = Body(i)
+                            if (bodylogic):
+                                i+=1
+                                if (TS[i][0] == "CCB"):
+                                    i+=1
+    return i, False
+
+def else_if(i):
+    i, iflogic = if_func(i)
+    if (iflogic):
+        i+=1
+        i, elselogic = else_st(i)
+        if (elselogic):
+            return i, True
+    return i, False
+
+def else_st(i):
+    if (TS[i][0] == "else"):
+            i+=1
+            if (TS[i][0] == "ORB"):
+                i+=1
+                i, condLogic = cond(i)
+                if(condLogic):
+                    i+=1
+                    if (TS[i][0] == "CRB"):
+                        i+=1
+                        if (TS[i][0] == "OCB"):
+                            i+=1
+                            i, bodylogic = Body(i)
+                            if (bodylogic):
+                                i+=1
+                                if (TS[i][0] == "CCB"):
+                                    i+=1
+                                    i, elselogic = else_st(i)
+                                    if (elselogic):
+                                        return i, True
+    elif(TS[i][0]=="elif"):
+        i+=1
+        if (TS[i][0] == "ORB"):
+            i+=1
+            i, condLogic = cond(i)
+            if(condLogic):
+                i+=1
+                if (TS[i][0] == "CRB"):
+                    i+=1
+                    if (TS[i][0] == "OCB"):
+                        i+=1
+                        i, bodylogic = Body(i)
+                        if (bodylogic):
+                            i+=1
+                            if (TS[i][0] == "CCB"):
+                                i+=1
+                                i, elselogic = else_st(i)
+                                if (elselogic):
+                                    return i, True
+    return i, True
+
+def NT(i):
+    i, IDlogic = ID(i)
+    if (IDlogic):
+        return i, True
+    if (TS[i][0] == "range"):
+        i+=1
+        if (TS[i][0] == "INTCONST"):
+            return i, True
+    return i, False
+
+def for_func(i):
+    if (TS[i][0] == "for"):
+        i+=1
+        i, idlogic = ID(i)
+        if(idlogic):
+            i+=1
+            if (TS[i][1] == "in"):
+                i+=1
+                i, NTlogic = NT(i)
+                if (NTlogic):
+                    i+=1
+                    if (TS[i][0] == "OCB"):
+                        i+=1
+                        i, bodylogic = Body(i)
+                        if (bodylogic):
+                            i+=1
+                            if (TS[i][0] == "CCB"):
+                                return i, True
+    return i, False
+
+def A(i):
+    if(TS[i][0] == "SAO"):
+        return i, True
+    elif (TS[i][0] == "CAO"):
+        return i, True
+    return i, False
+
+def assign(i):
+    i, IDlogic = ID(i)
+    if(IDlogic):
+        i+=1
+        i, Alogic = A(i)
+        if (Alogic):
+            i, OElogic = OE(i)
+            if (OElogic):
+                i+=1
+                if (TS[i][0] == ";"):
+                    return i, True
+    return i, False
+
+def obj_dec(i):
+    if (TS[i][0] == "ID"):
+        i+=1
+        if (TS[i][0] == "SAO"):
+            i+=1
+            if(TS[i][0] == "ID"):
+                i+=1
+                if (TS[i][0] == "ORB"):
+                    i += 1  
+                    i, argsLogic = args(i)
+                    if (argsLogic):
+                        i+=1
+                        if (TS[i][0] == "CRB"):
+                            i+=1
+                            if (TS[i][0] == ";"):
+                                return i, True
+    return i, False
+
+def exp(i):
+    i, constLogic = const(i)
+    if (constLogic):
+        return i, True
+    i , IDlogic = ID(i)
+    if (IDlogic):
+        return i, True
+    return False
+
+def ret(i):
+    if (TS[i][0] == "return"):
+        i+=1
+        i, expLogic = exp(i)
+        if (expLogic):
+            i+=1
+            if (TS[i][0] == ";"):
+                return i, True
+    return i, False
+
+def try_catch(i):
+    if (TS[i][0] == "try"):
+        i+=1
+        if (TS[i][0] == "OCB"):
+            i+=1
+            i, bodyLogic = Body(i)
+            if (bodyLogic):
+                i+=1
+                if (TS[i][0] == "CCB"):
+                    i+=1
+                    if (TS[i][0] == "except"):
+                        i+=1
+                        if (TS[i][0] == "ID"):
+                            i+=1
+                            if (TS[i][0] == "as"):
+                                i+=1
+                                if (TS[i][0] == "ID"):
+                                    i+=1
+                                    if (TS[i][0] == "OCB"):
+                                        i, bodyLogic = Body(i)
+                                        if (bodyLogic):
+                                            i+=1
+                                            if (TS[i][0] == "CCB"):
+                                                return i, True
+    return i, False
+
+def while_st(i):
+    if (TS[i][0] == "conditional"):
+        i+=1
+        if (TS[i][0] == "ORB"):
+            i+=1
+            i, OElogic = OE(i)
+            if (OElogic):
+                i+=1
+                if (TS[i][0] == "CRB"):
+                    i+=1
+                    if (TS[i][0] == "OCB"):
+                        i+=1
+                        i, bodylogic = Body(i)
+                        if (bodylogic):
+                            i+=1
+                            if (TS[i][0] == "CCB"):
+                                return i, True
+    return False
+
+def bring_st(i):
+    if (TS[i][0] == "import"):
+        i+=1
+        if (TS[i][0] == "ID"):
+            i+=1
+            if (TS[i][0] == "as"):
+                i+=1
+                if (TS[i][0] == "ID"):
+                    i+=1
+                    if (TS[i][0] == ";"):
+                        return i, True
+    return i, False
+
+def ip(i):
+    if (TS[i][0] == "TEXTCONST"):
+        return i, True
+    return i, True
+
+def take(i):
+    i, IDlogic = ID(i)
+    if (IDlogic):
+        i+=1
+        if (TS[i][0] == "SAO"):
+            i+=1
+            if (TS[i][0] == "input"):
+                i+=1
+                if (TS[i][0] == "ORB"):
+                    i+=1
+                    if (TS[i][0] == "DT"):
+                        i+=1
+                        if (TS[i][0] == "ORB"):
+                            i+=1
+                            i, iplogic = ip(i)
+                            if (iplogic):
+                                i+=1
+                                if (TS[i][0] == "CRB"):
+                                    i+=1
+                                    if (TS[i][0] == "CRB"):
+                                        i+=1
+                                        if (TS[i][0] == ";"):
+                                            return i, True
+        return i, False
+
+def arg3(i):
+    i, IDlogic = ID(i)
+    if (IDlogic):
+        i+=1
+        i, arg2logic = arg2(i)
+        if (arg2logic):
+            return i, True
+        
+    i, constlogic = const(i)
+    if (constlogic):
+        i+=1
+        i, arg2logic = arg2(i)
+        if (arg2logic):
+            return i, True
+    
+    return i, False
+
+def arg2(i):
+    if (TS[i][0] == "comma"):
+        i+=1
+        i, arg3logic = arg3(i)
+        if (arg3logic):
+            return i, True
+    return i, True
+
+
+def arg(i):
+    i, IDlogic = ID(i)
+    if (IDlogic):
+        i+=1
+        i, arg2logic = arg2(i)
+        if (arg2logic):
+            return i, True
+    
+    i, constlogic = const(i)
+    if (constlogic):
+        i+=1
+        i, arg2logic = arg2(i)
+        if (arg2logic):
+            return i, True
+    return i-1, True        
+
+def display(i):
+    if (TS[i][0] == "print"):
+        i+=1
+        if (TS[i][0] == "ORB"):
+            i+=1
+            i, arglogic = arg(i)
+            if (arglogic):
+                i+=1
+                if (TS[i][0] == "CRB"):
+                    i+=1
+                    if (TS[i][0] == ";"):
+                        return i, True
+    return i, False
+
+def var_list2(i):
+    if (TS[i][0] == "comma"):
+                i+=1
+                if (TS[i][0] == "ID"):
+                    i+=1
+                    i, var2logic = var_list2(i)
+                    if (var2logic):
+                        return i, True
+    return i, True
+
+def var_list(i):
+    if (TS[i][0] == "ID"):
+        i+=1
+        i, var2logic = var_list2(i)
+        if (var2logic):
+            return i, True
+    return i, False
+
+def extract(i):
+    if (TS[i][0] == "DT"):
+        i+=1
+        i, varlogic = var_list(i)
+        if (varlogic):
+            i+=1
+            if (TS[i][0] == "SAO"):
+                i+=1
+                if (TS[i][0] == "extract"):
+                    i+=1
+                    if (TS[i][0] == "ID"):
+                        i+=1
+                        if (TS[i][0] == ";"):
+                            return i, True
+    return i, True
+
+def args2(i):
+    if (TS[i][0] == "comma"):
+        i+=1
+        if (TS[i][0] == "DT"):
+            i+=1
+            if (TS[i][0] == "ID"):
+                i+=1
+                i, args2logic = args2(i)
+                if (args2logic):
+                    return i, True
+    return i, True
+
+def argscomp(i):
+    if (TS[i][0] == "DT"):
+        i+=1
+        if (TS[i][0] == "ID"):
+            i+=1
+            i, args2logic = args2(i)
+            if (args2logic):
+                return i, True
+    return i, True
+
+def func_def(i):
+    if (TS[i][0] == "def"):
+        i+=1
+        if (TS[i][0] == "DT"):
+            i+=1
+            if (TS[i][0] == "ID"):
+                i+=1
+                if (TS[i][0] == "ORB"):
+                    i+=1
+                    i, argscomp_logic = argscomp(i)
+                    if (argscomp_logic):
+                        i+=1
+                        if (TS[i][0] == "CRB"):
+                            i+=1
+                            if (TS[i][0] == "OCB"):
+                                i+=1
+                                i, bodylogic = Body(i)
+                                if (bodylogic):
+                                    i+=1
+                                    if (TS[i][0] == "CCB"):
+                                        return i, True
+    return i, False
+
+def SST(i):
+    i, Decl_logic = Decl(i)
+    if (Decl_logic):
+        return i, True
+    
+    i, mapdecl_logic = map_decl(i)
+    if (mapdecl_logic):
+        return i, True
+    
+    i, listdecl_logic = list_decl(i)
+    if (listdecl_logic):
+        return i, True
+    
+    i, whilest_logic = while_st(i)
+    if (whilest_logic):
+        return i, True
+    
+    i, if_logic = if_func(i)
+    if (if_logic):
+        return i, True
+    
+    i, ifelse_logic = if_else(i)
+    if (ifelse_logic):
+        return i, True
+    
+    i, elif_logic = else_if(i)
+    if (elif_logic):
+        return i, True
+    
+    i, for_logic = for_func(i)
+    if (for_logic):
+        return i, True
+    
+    i, assign_logic = assign(i)
+    if (assign_logic):
+        return i, True
+    
+    i, obj_logic = obj_dec(i)
+    if (obj_logic):
+        return i, True
+    
+    i, fc_logic = fn_call(i)
+    if (fc_logic):
+        return i, True
+    
+    i, ret_logic = ret(i)
+    if (ret_logic):
+        return i, True
+    
+    i, tc_logic = try_catch(i)
+    if (tc_logic):
+        return i, True
+    
+    i, fd_logic = func_def(i)
+    if (fd_logic):
+        return i, True
+    
+    i, ex_logic = extract(i)
+    if (ex_logic):
+        return i, True
+    
+    i, dis_logic = display(i)
+    if (dis_logic):
+        return i, True
+    
+    i, take_logic = take(i)
+    if (take_logic):
+        return i, True
+    
+    i, bring_logic = bring_st(i)
+    if (bring_logic):
+        return i, True
+    
+
+def MST(i):
+    i, SSTlogic = SST(i)
+    if (SSTlogic):
+        i+=1
+        i, MSTlogic = MST(i)
+        if (MSTlogic):
+            return i, True
+    return i-1, True
+
+def Body(i):
+    i, SSTlogic = SST(i)
+    if (SSTlogic):
+        return i, True
+    
+    i, MSTlogic = MST(i)
+    if (MSTlogic):
+        return i, True
+
     return i, False

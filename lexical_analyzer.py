@@ -1,6 +1,6 @@
 import re
 
-kw = {"int" : "DT", "flt" : "DT", "chr" : "DT", "text" : "DT", "logic" : "DT", "list_of" : "list", "dict_of" : "map", "bring_back" : "return", "while_so" : "conditional", "given" : "conditional", "otherwise" : "else", "else_if" : "elif", "for_each" : "for", "stop" : "flow control", "go_on" : "flow control", "doing" : "def", "display" : "print", "take" : "input", "bring" : "import", "extract" : "extract", "as" : "as", "classy" : "class", "is_a" : "inheritance", "has" : "has", "init" : "init", "base" : "base", "this" : "this", "priv" : "AM", "pro" : "AM"}
+kw = {"int" : "DT", "flt" : "DT", "chr" : "DT", "text" : "DT", "logic" : "DT", "list_of" : "list", "dict_of" : "map", "bring_back" : "return", "while_so" : "conditional", "given" : "conditional", "otherwise" : "else", "else_if" : "elif", "for_each" : "for", "stop" : "flow control", "go_on" : "flow control", "doing" : "def", "display" : "print", "take" : "input", "bring" : "import", "extract" : "extract", "as" : "as", "classy" : "class", "is_a" : "inheritance", "has" : "has", "init" : "init", "base" : "base", "this" : "this", "priv" : "AM", "pro" : "AM", "range":"range", "try":"try", "except":"except"}
 opr = {"+" : "AO", "-" : "AO", "*" : "AO", "/" : "AO", "%" : "AO", "**" : "AO", "==" : "RO", "!=" : "RO", "<=" : "RO", ">=" : "RO", "<" : "RO", ">" : "RO", "and" : "and", "or" : "or", "not" : "not", "=" : "SAO", "+=" : "CAO", "-=" : "CAO", "in" : "RO", "is" : "RO"}
 punc = {";" : ";", ":" : "colon", "," : "comma", "." : "dot", "(" : "ORB", ")" : "CRB", "{" : "OCB", "}" : "CCB", "[" : "OSB", "]" : "CSB", "#/" : "comment"}
 
@@ -187,6 +187,7 @@ def breakWords(code):
             # ending the string when a double quote is found
             if (i < len(code) and code[i] == "\""):
                 word = word + code[i]
+                i+=1
 
             word, i, current_token = generateToken(word, line, i)
             tokenList.append(current_token)
