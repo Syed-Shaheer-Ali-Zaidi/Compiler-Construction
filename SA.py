@@ -5,22 +5,22 @@ TS = LA.breakWords(code)
 
 def const(i):
     if (TS[i][0] == "INTCONST"):
-        return i, True
+        return i + 1, True
     if (TS[i][0] == "FLTCONST"):
-        return i, True
+        return i + 1, True
     if (TS[i][0] == "CHRCONST"):
-        return i, True
+        return i + 1, True
     if (TS[i][0] == "TEXTCONST"):
-        return i, True
+        return i + 1, True
     if (TS[i][0] == "LOGICCONST"):
-        return i, True
+        return i + 1, True
     print("Invalid Constant at ", TS[i][1], " in line number ", TS[i][2])
     return i, False 
     
 
 def list2(i):
     if (TS[i][0] == ";"):
-        return i, True
+        return i + 1, True
     if (TS[i][0] == "comma"):
         i+=1
         if (TS[i][0] == "ID"):
@@ -56,7 +56,6 @@ def init(i):
     if(TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
         i, const_logic = const(i)
         if (const_logic):
-            i+=1
             if (TS[i][0] == ";" or TS[i][0] == "comma"):
                 i, list2Logic = list2(i)
                 if(list2Logic):
@@ -90,9 +89,9 @@ def list(i):
             print("Error, expected an identifier at ", TS[i][1], " in line number ", TS[i][2])
             return i, False
     elif (TS[i][0] == ";"):
-        return i, True
+        return i + 1, True
     elif (TS[i][0] == "SAO"):
-        i+=1
+        i+=1    
         if (TS[i][0] == "ID" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
             i, initLogic = init(i)
             if(initLogic):
@@ -134,7 +133,6 @@ def new(i):
         if (TS[i][0]=="ID" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST" or TS[i][0] == "ORB" or TS[i][0] == "not"):
             i, OElogic = OE(i)
             if (OElogic):
-                i+=1
                 i, newlogic = new(i)
                 if (newlogic):
                     return i, True
@@ -152,7 +150,6 @@ def args(i):
     if (TS[i][0]=="ID" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST" or TS[i][0] == "ORB" or TS[i][0] == "not"):
         i, OElogic = OE(i)
         if (OElogic):
-            i+=1
             i, newlogic = new(i)
             if (newlogic):
                 return i, True
@@ -160,21 +157,19 @@ def args(i):
                 return i, False
         else:
             return i, False
-    return i-1, True
+    return i, True
 
 def fn_call(i):
     i, IDcomplogic = IDcomp(i)
     if (IDcomplogic):
-        i+=1
         if (TS[i][0] == "ORB"):
             i+=1
             i, argslogic = args(i)
             if (argslogic):
-                i+=1
                 if (TS[i][0] == "CRB"):
                     i+=1
                     if (TS[i][0] == ";"):
-                        return i, True
+                        return i + 1, True
                     else:
                         print("Error, expected a ; at ", TS[i][1], " in line number ", TS[i][2])
                         return i, False
@@ -208,7 +203,6 @@ def IDcomp(i):
         if (TS[i][0]=="ID" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST" or TS[i][0] == "ORB" or TS[i][0] == "not"):
             i, OElogic = OE(i)
             if (OElogic):
-                i+=1
                 if (TS[i][0] == "CSB"):
                     i+=1
                     i, IDcomplogic = IDcomp(i)
@@ -224,12 +218,20 @@ def IDcomp(i):
         else:
             print("Error, expected an identifier or a constant or ( or ! at ", TS[i][1], " in line number ", TS[i][2])
             return i, False
+    elif (TS[i][0]=="ORB"):
+        i+=1
+        i, argslogic = args(i)
+        if (argslogic):
+            if (TS[i][0]=="CRB"):
+                i+=1
+                i, idcomplogic = IDcomp(i)
+                if (idcomplogic):
+                    return i, True
     else:
         return i, True
 
 def ID(i):
     if (TS[i][0] == "ID"):
-        print(TS[i][0])
         i+=1
         i, IDcomplogic = IDcomp(i)
         if (IDcomplogic):
@@ -242,10 +244,10 @@ def ID(i):
 
 def ind(i):
     if (TS[i][0] == "ID"):
-        return i, True
+        return i + 1, True
     
     if( TS[i][0] == "INTCONST"):
-        return i, True
+        return i + 1, True
     else:
         print("Error, expected an identifier or an integar constant at ", TS[i][1], " in line number ", TS[i][2])
         return i, False
@@ -286,8 +288,8 @@ def CAO(i):
 def inc_dec(i):
     i, IDcomplogic = IDcomp(i)
     if (IDcomplogic): 
-        i+=1
         if (TS[i][0]=="CAO"):
+            i+=1
             i, CAOlogic = CAO(i)
             if (CAOlogic):
                 return i, True
@@ -300,35 +302,35 @@ def inc_dec(i):
 
 def dci(i):
     if (TS[i][0] == "ID"):
-        return i, True
+        return i + 1, True
     elif (TS[i][0] == "INTCONST"):
-        return i, True
+        return i + 1, True
     elif (TS[i][0] == "FLTCONST"):
-        return i, True
+        return i + 1, True
     else:
         print("Error, expected identifier or integer / float constant at ", TS[i][1], " in line number ", TS[i][2])
         return i, False
 
 def P(i):
     if (TS[i][0] == "ID"):
-        return i, True
+        return i + 1, True
     elif (TS[i][0] == "INTCONST"):
-        return i, True
+        return i + 1, True
     elif (TS[i][0] == "FLTCONST"):
-        return i, True
+        return i + 1, True
     elif (TS[i][0] == "LOGICCONST"):
-        return i, True
+        return i + 1, True
     else:
         print("Error, expected expected identifier or integer / float / logic constant at ", TS[i][1], " in line number ", TS[i][2])
         return i, False
             
 def Pcomp(i):
     if (TS[i][0]=="INTCONST"):
-        return i, True
+        return i + 1, True
     elif (TS[i][0]=="FLTCONST"):
-        return i, True
+        return i + 1, True
     elif (TS[i][0]=="LOGICCONST"):
-        return i, True
+        return i + 1, True
     else:
         print("Error, expected an integar, float or logic constant at ", TS[i][1], " in line number ", TS[i][2])
 
@@ -375,9 +377,8 @@ def F(i):
         if (TS[i][0]=="ID" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST" or TS[i][0] == "ORB" or TS[i][0] == "not"):
             i, OElogic = OE(i)
             if (OElogic):
-                i+=1
                 if (TS[i][0] == "CRB"):
-                    return i, True
+                    return i + 1, True
                 else:
                     print("Error, expected a ] at ", TS[i][1], " in line number ", TS[i][2])
                     return i, False
@@ -408,7 +409,6 @@ def MDM(i):
     if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
         i, Flogic = F(i)
         if (Flogic):
-            i+=1
             i, MDMcomp_logic = MDMcomp(i)
             if (MDMcomp_logic):
                 return i, True
@@ -424,7 +424,6 @@ def PM(i):
     if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
         i, MDMlogic = MDM(i)
         if (MDMlogic):
-            i+=1
             i, PMcomp_logic = PMcomp(i)
             if (PMcomp_logic):
                 return i, True
@@ -440,7 +439,6 @@ def RE(i):
     if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
         i, PMlogic = PM(i)
         if (PMlogic):
-            i+=1
             i, REcomp_logic = REcomp(i)
             if (REcomp_logic):
                 return i, True
@@ -456,7 +454,6 @@ def AE(i):
     if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
         i, RElogic = RE(i)
         if (RElogic):
-            i+=1
             i, AEcomp_logic = AEcomp(i)
             if (AEcomp_logic):
                 return i, True
@@ -472,7 +469,6 @@ def OE(i):
     if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
         i, AElogic = AE(i)
         if (AElogic):
-            i+=1
             i, OEcomp_logic = OEcomp(i)
             if (OEcomp_logic):
                 return i, True
@@ -490,13 +486,11 @@ def cont(i):
         if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
             i, OElogic = OE(i)
             if (OElogic):
-                i+=1
                 if (TS[i][0] == "colon"):
                     i+=1
                     if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
                         i, OElogic = OE(i)
                         if (OElogic):
-                            i+=1
                             i, contlogic = cont(i)
                             if (contlogic):
                                 return i, True
@@ -516,7 +510,7 @@ def cont(i):
             print("Error, expected an identifier or a constant or ( or ! at ", TS[i][1], " in line number ", TS[i][2])
             return i, False 
     else:
-        return i-1  , True
+        return i  , True
 
 def PMcomp(i):
     if (TS[i][0] == "PM"):
@@ -524,7 +518,6 @@ def PMcomp(i):
         if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
             i, MDMlogic = MDM(i)
             if (MDMlogic):
-                i+=1
                 i, PMcomplogic = PMcomp(i)
                 if (PMcomplogic):
                     return i, True
@@ -536,7 +529,7 @@ def PMcomp(i):
             print("Error, expected an identifier or a constant or ( or ! at ", TS[i][1], " in line number ", TS[i][2])
             return i, False 
     else:
-        return i-1, True
+        return i, True
 
 def MDMcomp(i):
     if (TS[i][0] == "MDM"):
@@ -544,7 +537,6 @@ def MDMcomp(i):
         if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
             i, flogic = F(i)
             if (flogic):
-                i+=1
                 i, MDMcomplogic = MDMcomp(i)
                 if (MDMcomplogic):
                     return i, True
@@ -556,7 +548,7 @@ def MDMcomp(i):
             print("Error, expected an identifier or a constant or ( or ! at ", TS[i][1], " in line number ", TS[i][2])
             return i, False 
     else:
-        return i-1, True
+        return i, True
 
 def REcomp(i):
     if (TS[i][0] == "RO"):
@@ -564,7 +556,6 @@ def REcomp(i):
         if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
             i, PMlogic = PM(i)
             if (PMlogic):
-                i+=1
                 i, REcomplogic = REcomp(i)
                 if (REcomplogic):
                     return i, True
@@ -576,7 +567,7 @@ def REcomp(i):
             print("Error, expected an identifier or a constant or ( or ! at ", TS[i][1], " in line number ", TS[i][2])
             return i, False
     else:
-        return i-1, True            
+        return i, True            
 
 def AEcomp(i):
     if (TS[i][0] == "and"):
@@ -584,7 +575,6 @@ def AEcomp(i):
         if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
             i, RElogic = RE(i)
             if (RElogic):
-                i+=1
                 i, AEcomplogic = AEcomp(i)
                 if (AEcomplogic):
                     return i, True
@@ -596,7 +586,7 @@ def AEcomp(i):
             print("Error, expected an identifier or a constant or ( or ! at ", TS[i][1], " in line number ", TS[i][2])
             return i, False
     else:
-        return i-1, True
+        return i, True
 
 def OEcomp(i):
     if (TS[i][0] == "or"):
@@ -604,7 +594,6 @@ def OEcomp(i):
         if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
             i, AElogic = AE(i)
             if (AElogic):
-                i+=1
                 i, OEcomplogic = OEcomp(i)
                 if (OEcomplogic):
                     return i, True
@@ -616,7 +605,7 @@ def OEcomp(i):
             print("Error, expected an identifier or a constant or ( or ! at ", TS[i][1], " in line number ", TS[i][2])
             return i, False
     else:
-        return i-1, True
+        return i, True
 
 
 def map_decl(i):
@@ -634,11 +623,10 @@ def map_decl(i):
                             if (OElogic):
                                 i, contlogic = cont(i)
                                 if (contlogic):
-                                    i+=1
                                     if (TS[i][0] == "CCB"):
                                         i+=1
                                         if (TS[i][0] == ";"):
-                                            return i, True
+                                            return i + 1, True
                                         else:
                                             print("Error, expected a ; at ", TS[i][1], " in line number ", TS[i][2])
                                             return i, False
@@ -668,14 +656,13 @@ def map_decl(i):
         return i, False
 
 def contComp(i):
-    if (TS[i][0] == "comma"):
+    if (TS[i][0]=="comma"):
         i+=1
         if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
-            i, Llogic = L(i)
-            if (Llogic):
-                i+=1
-                i, contClogic = contComp(i)
-                if (contClogic):
+            i, OElogic = OE(i)
+            if (OElogic):
+                i , contComplogic = contComp(i)
+                if (contComplogic):
                     return i, True
                 else:
                     return i, False
@@ -683,54 +670,108 @@ def contComp(i):
                 return i, False
         else:
             print("Error, expected an identifier or a constant or ( or ! at ", TS[i][1], " in line number ", TS[i][2])
-            return i, False
+            return i, False  
     else:
         return i, True
 
-def listComp(i):
-    if (TS[i][0] == "list"):
+def twoD(i):
+    if (TS[i][0]=="OSB"):
         i+=1
-        if (TS[i][0] == "OSB"):
-            i+=1
-            if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST" or TS[i][0]=="list"):
-                i, Llogic = L(i)
-                if (Llogic):
-                    i+=1
-                    i, contClogic = contComp(i)
-                    if (contClogic):
-                        if (TS[i][0] == "CSB"):
-                            return i, True
+        if (TS[i][0] == "ID" or TS[i][0]=="INTCONST"):
+            i, indlogic = ind(i)
+            if (indlogic):
+                if(TS[i][0]=="CSB"):
+                    return i + 1, True
+                else:
+                    print ("Error, expected a ] ", TS[i][1], " in line number ", TS[i][2])
+                    return i, False
+            else:
+                return i, False
+        else:
+            print("Error, expected an identifier or INTCONSTANT at", TS[i][1], "in line number", TS[i][2])
+    else:
+        return i, True
+# def listComp(i):
+#     if (TS[i][0] == "list"):
+#         i+=1
+#         if (TS[i][0] == "OSB"):
+#             i+=1
+#             if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST" or TS[i][0]=="list"):
+#                 i, Llogic = L(i)
+#                 if (Llogic):
+#                     i, contClogic = contComp(i)
+#                     if (contClogic):
+#                         if (TS[i][0] == "CSB"):
+#                             return i + 1, True
+#                         else:
+#                             print("Error, expected } at ", TS[i][1], " in line number ", TS[i][2])
+#                     else:
+#                         return i, False
+#                 else:
+#                     return i, False
+#             else:
+#                 print("Error, expected an identifier or a constant or ( or ! at ", TS[i][1], " in line number ", TS[i][2])
+#                 return i, False
+#         else:
+#             print("Error, expected [ at ", TS[i][1], " in line number ", TS[i][2])
+#     else:
+#         print("Error, expected \"list_of\" at ", TS[i][1], " in line number ", TS[i][2])
+#         return i, False
+
+def Lcomp(i):
+    if (TS[i][0]=="comma"):
+        i+=1
+        i , Llogic = L(i)
+        if (Llogic):
+            return i, True
+        else:
+            return i, False
+    else:
+        return i , True
+
+def L(i):
+    if (TS[i][0]=="OSB"):
+        i+=1
+        if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
+            i, OElogic = OE(i)
+            if (OElogic):
+                i, contCompLogic = contComp(i)
+                if (contCompLogic):
+                    if (TS[i][0]=="CSB"):
+                        i+=1
+                        i , Lcomplogic = Lcomp(i)
+                        if (Lcomplogic):
+                            return i , True
                         else:
-                            print("Error, expected } at ", TS[i][1], " in line number ", TS[i][2])
+                            return i, False
                     else:
+                        print("Error, expected a ] at ", TS[i][1], " in line number ", TS[i][2])
                         return i, False
                 else:
                     return i, False
             else:
-                print("Error, expected an identifier or a constant or ( or ! at ", TS[i][1], " in line number ", TS[i][2])
                 return i, False
         else:
-            print("Error, expected [ at ", TS[i][1], " in line number ", TS[i][2])
-    else:
-        print("Error, expected \"list_of\" at ", TS[i][1], " in line number ", TS[i][2])
-        return i, False
-
-def L(i):
-    if (TS[i][0] == "list"):
-        i, listClogic = listComp(i)
-        if (listClogic):
-            return i, True
-        else:
+            print("Error, expected a \"not\" or \"ID\" or \"(\" or \"constant\" at ", TS[i][1], " in line number ", TS[i][2])
             return i, False
-    if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
-        i, OElogic = OE(i)
-        if (OElogic):
-            return i-1, True
+        
+    elif(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
+        i , OElogic = OE(i)
+        if(OElogic):
+            i, contCompLogic = contComp(i)
+            if (contCompLogic):
+                i, Lcomplog = Lcomp(i)
+                if (Lcomplog):
+                    return i , True
+                else:
+                    return i, False
+            else:
+                return i, False
         else:
-            return i, False
+            return i, False     
+                  
     else:
-        print("Error, expected an identifier or a constant or ( or ! or \"list_of\"at ", TS[i][1], " in line number ", TS[i][2])
-        return i, False
+        return i , True
 
 def list_decl(i):
     if (TS[i][0] == "OSB"):
@@ -738,26 +779,35 @@ def list_decl(i):
         if (TS[i][0] == "ID" or TS[i][0]=="INTCONST"):
             i, indlogic = ind(i)
             if (indlogic):
-                i+=1
                 if (TS[i][0] == "CSB"):
                     i+=1
-                    if (TS[i][0] == "SAO"):
-                        i+=1
-                        if (TS[i][0] == "list"):
-                            i, listcomp_logic = listComp(i)
-                            if (listcomp_logic):
+                    i, twoDlogic = twoD(i)
+                    if (twoDlogic):
+                        if (TS[i][0] == "SAO"):
+                            i+=1
+                            if (TS[i][0] == "OSB"):
                                 i+=1
-                                if (TS[i][0] == ";"):
-                                    return i, True
+                                i, Llogic = L(i)
+                                if (Llogic):
+                                    if (TS[i][0]=="CSB"):
+                                        i+=1
+                                        if (TS[i][0]==";"):
+                                            return i+1, True
+                                        else:
+                                            print("Error, expected a ; at ", TS[i][1], " in line number ", TS[i][2])
+                                            return i, False
+                                    else:
+                                        print("Error, expected a ) at ", TS[i][1], " in line number ", TS[i][2])
+                                        return i, False
                                 else:
-                                    print("Error, expected ; at ", TS[i][1], " in line number ", TS[i][2])
+                                    return i, False
                             else:
+                                print("Error, expected a ( at ", TS[i][1], " in line number ", TS[i][2])
                                 return i, False
                         else:
-                            print("Error, expected \"list_of\" at ", TS[i][1], " in line number ", TS[i][2])
+                            print("Error, expected = at ", TS[i][1], " in line number ", TS[i][2])
                             return i, False
                     else:
-                        print("Error, expected = at ", TS[i][1], " in line number ", TS[i][2])
                         return i, False
                 else:
                     print("Error, expected ] at ", TS[i][1], " in line number ", TS[i][2])
@@ -789,16 +839,14 @@ def if_func(i):
             if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
                 i, OElogic = OE(i)
                 if (OElogic):
-                    i+=1
                     if (TS[i][0] == "CRB"):
                         i+=1
                         if (TS[i][0] == "OCB"):
                             i+=1
                             i, bodylogic = Body(i)
                             if (bodylogic):
-                                i+=1
                                 if (TS[i][0] == "CCB"):
-                                    return i, True
+                                    return i + 1, True
                                 else:
                                     print("Error, expected } at ", TS[i][1], "in line number ", TS[i][2])
                                     return i, False
@@ -860,14 +908,12 @@ def else_st(i):
             i+=1
             i, condLogic = cond(i)
             if(condLogic):
-                i+=1
                 if (TS[i][0] == "CRB"):
                     i+=1
                     if (TS[i][0] == "OCB"):
                         i+=1
                         i, bodylogic = Body(i)
                         if (bodylogic):
-                            i+=1
                             if (TS[i][0] == "CCB"):
                                 i+=1
                                 i, elselogic = else_st(i)
@@ -890,6 +936,7 @@ def else_st(i):
                 return i, False
         else:
             print("Error, expected ( at ", TS[i][1], "in line number ", TS[i][2])
+            return i, False
 
     elif(TS[i][0]=="elif"):
         i+=1
@@ -897,14 +944,12 @@ def else_st(i):
             i+=1
             i, condLogic = cond(i)
             if(condLogic):
-                i+=1
                 if (TS[i][0] == "CRB"):
                     i+=1
                     if (TS[i][0] == "OCB"):
                         i+=1
                         i, bodylogic = Body(i)
                         if (bodylogic):
-                            i+=1
                             if (TS[i][0] == "CCB"):
                                 i+=1
                                 i, elselogic = else_st(i)
@@ -941,7 +986,7 @@ def NT(i):
     elif (TS[i][0] == "range"):
         i+=1
         if (TS[i][0] == "INTCONST"):
-            return i, True
+            return i + 1, True
         else:
             return i, False
     else:
@@ -954,20 +999,17 @@ def for_func(i):
         if (TS[i][0] == "ID"):
             i, idlogic = ID(i)
             if(idlogic):
-                i+=1
                 if (TS[i][1] == "in"):
                     i+=1
                     if(TS[i][0]=="ID" or TS[i][0]=="range"):
                         i, NTlogic = NT(i)
                         if (NTlogic):
-                            i+=1
                             if (TS[i][0] == "OCB"):
                                 i+=1
                                 i, bodylogic = Body(i)
                                 if (bodylogic):
-                                    i+=1
                                     if (TS[i][0] == "CCB"):
-                                        return i, True
+                                        return i + 1, True
                                     else:
                                         print("Error, expected a } at ", TS[i][1], " in line number ",TS[i][2])
                                         return i, False
@@ -995,39 +1037,43 @@ def for_func(i):
 
 def A(i):
     if(TS[i][0] == "SAO"):
-        return i, True
+        return i + 1, True
     elif (TS[i][0] == "CAO"):
-        return i, True
+        return i + 1, True
     else:
         print("Error, expected an = or += or -= at ", TS[i][1], " in line number ",TS[i][2])
         return i, False
 
+def assign2(i):
+    if (TS[i][0]=="SAO" or TS[i][0]=="CAO"):
+        i, Alogic = A(i)
+        if (Alogic):
+            if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
+                i, OElogic = OE(i)
+                if (OElogic):
+                    if (TS[i][0] == ";"):
+                        return i + 1, True
+                    else:
+                        print("Error, expected ; at ", TS[i][1]," in line number", TS[i][2])
+                        return i, False
+                else:
+                    return i, False
+            else:
+                print("Error, expected an identifier or a constant or ( or ! at ", TS[i][1], " in line number ", TS[i][2])
+                return i, False
+        else:
+            return i, False
+    else:
+        #print("Error, expected a = or += or -= at ", TS[i][1]," in line number", TS[i][2])
+        return i, True
+
 def assign(i):
     i, IDcomplogic = IDcomp(i)
     if(IDcomplogic):
-        i+=1
-        if (TS[i][0]=="SAO" or TS[i][0]=="CAO"):
-            i, Alogic = A(i)
-            if (Alogic):
-                i+=1
-                if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
-                    i, OElogic = OE(i)
-                    if (OElogic):
-                        i+=1
-                        if (TS[i][0] == ";"):
-                            return i, True
-                        else:
-                            print("Error, expected ; at ", TS[i][1]," in line number", TS[i][2])
-                            return i, False
-                    else:
-                        return i, False
-                else:
-                    print("Error, expected an identifier or a constant or ( or ! at ", TS[i][1], " in line number ", TS[i][2])
-                    return i, False
-            else:
-                return i, False
+        i, assign2logic = assign2(i)
+        if (assign2logic):
+            return i, True
         else:
-            print("Error, expected a = or += or -= at ", TS[i][1]," in line number", TS[i][2])
             return i, False
     else:
         return i, False
@@ -1037,11 +1083,10 @@ def obj_dec(i):
         i += 1  
         i, argsLogic = args(i)
         if (argsLogic):
-            i+=1
             if (TS[i][0] == "CRB"):
                 i+=1
                 if (TS[i][0] == ";"):
-                    return i, True
+                    return i + 1, True
                 else:
                     print("Error, expected a ; at ", TS[i][1], " in line number ", TS[i][2])
                     return i, False
@@ -1064,7 +1109,7 @@ def exp(i):
     if (TS[i][0]=="ID"):
         i , IDlogic = ID(i)
         if (IDlogic):
-            return i-1, True
+            return i, True
         else:
             return i, False
     else:
@@ -1077,9 +1122,8 @@ def ret(i):
         if(TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST" or TS[i][0] == "ID" ): 
             i, expLogic = exp(i)
             if (expLogic):
-                i+=1
                 if (TS[i][0] == ";"):
-                    return i, True
+                    return i + 1, True
                 else:
                     print("Error, expected a ; at ", TS[i][1], " in line number ", TS[i][2])
                     return i, False
@@ -1099,7 +1143,6 @@ def try_catch(i):
             i+=1
             i, bodyLogic = Body(i)
             if (bodyLogic):
-                i+=1
                 if (TS[i][0] == "CCB"):
                     i+=1
                     if (TS[i][0] == "except"):
@@ -1114,9 +1157,8 @@ def try_catch(i):
                                         i+=1
                                         i, bodyLogic = Body(i)
                                         if (bodyLogic):
-                                            i+=1
                                             if (TS[i][0] == "CCB"):
-                                                return i, True
+                                                return i + 1, True
                                             else:
                                                 print("Error, expected a } at ", TS[i][1], " in line number ", TS[i][2])
                                                 return i, False
@@ -1157,16 +1199,14 @@ def while_st(i):
             if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
                 i, OElogic = OE(i)
                 if (OElogic):
-                    i+=2
                     if (TS[i][0] == "CRB"):
                         i+=1
                         if (TS[i][0] == "OCB"):
                             i+=1
                             i, bodylogic = Body(i)
                             if (bodylogic):
-                                i+=1
                                 if (TS[i][0] == "CCB"):
-                                    return i, True
+                                    return i + 1, True
                                 else:
                                     print("Error, expected } at ", TS[i][1], " in line number ", TS[i][2])
                                     return i, False
@@ -1200,7 +1240,7 @@ def bring_st(i):
                 if (TS[i][0] == "ID"):
                     i+=1
                     if (TS[i][0] == ";"):
-                        return i, True
+                        return i + 1, True
                     else:
                         print("Error, expected a ; at ", TS[i][1], " in line number ", TS[i][2])
                         return i, False
@@ -1219,7 +1259,7 @@ def bring_st(i):
 
 def ip(i):
     if (TS[i][0] == "TEXTCONST"):
-        return i, True
+        return i + 1, True
     else:
         return i, True
 
@@ -1230,25 +1270,30 @@ def takeComp(i):
             i+=1
             if (TS[i][0] == "DT"):
                 i+=1
-                if (TS[i][0] == "TEXTCONST"):
+                if (TS[i][0] == "ORB"):
                     i+=1
-                    if (TS[i][0] == "CRB"):
+                    if (TS[i][0] == "TEXTCONST"):
                         i+=1
                         if (TS[i][0] == "CRB"):
                             i+=1
-                            if (TS[i][0] == ";"):
-                                return i, True
+                            if (TS[i][0] == "CRB"):
+                                i+=1
+                                if (TS[i][0] == ";"):
+                                    return i + 1, True
+                                else:
+                                    print("Error, expected a ; at ", TS[i][1], " in line number ", TS[i][2])
+                                    return i, False
                             else:
-                                print("Error, expected a ; at ", TS[i][1], " in line number ", TS[i][2])
+                                print("Error, expected ) at ", TS[i][1], " in line number ", TS[i][2])
                                 return i, False
                         else:
                             print("Error, expected ) at ", TS[i][1], " in line number ", TS[i][2])
                             return i, False
                     else:
-                        print("Error, expected ) at ", TS[i][1], " in line number ", TS[i][2])
+                        print("Error, expected text constant at ", TS[i][1], " in line number ", TS[i][2])
                         return i, False
                 else:
-                    print("Error, expected text constant at ", TS[i][1], " in line number ", TS[i][2])
+                    print ("Error, expected ( at ", TS[i][1], " in line number ", TS[i][2])
                     return i, False
             else:
                 print("Error, expected DT at ", TS[i][1], " in line number ", TS[i][2])
@@ -1263,7 +1308,6 @@ def takeComp(i):
 def take(i):
     i, IDcomplogic = IDcomp(i)
     if (IDcomplogic):
-        i+=1
         if (TS[i][0] == "SAO"):
             i+=1
             if (TS[i][0] == "input"):
@@ -1276,13 +1320,12 @@ def take(i):
                             i+=1
                             i, iplogic = ip(i)
                             if (iplogic):
-                                i+=1
                                 if (TS[i][0] == "CRB"):
                                     i+=1
                                     if (TS[i][0] == "CRB"):
                                         i+=1
                                         if (TS[i][0] == ";"):
-                                            return i, True
+                                            return i + 1, True
                                         else:
                                             print("Error, expected a ; at ", TS[i][1], " in line number ", TS[i][2])
                                             return i, False
@@ -1316,7 +1359,6 @@ def arg3(i):
     if (TS[i][0]=="ID"):
         i, IDlogic = ID(i)
         if (IDlogic):
-            i+=1
             i, arg2logic = arg2(i)
             if (arg2logic):
                 return i, True
@@ -1327,7 +1369,6 @@ def arg3(i):
     elif(TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):    
         i, constlogic = const(i)
         if (constlogic):
-            i+=1
             i, arg2logic = arg2(i)
             if (arg2logic):
                 return i, True
@@ -1359,7 +1400,6 @@ def arg(i):
     if (TS[i][0] == "ID"):
         i, IDlogic = ID(i)
         if (IDlogic):
-            i+=1
             i, arg2logic = arg2(i)
             if (arg2logic):
                 return i, True
@@ -1370,7 +1410,6 @@ def arg(i):
     elif(TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
         i, constlogic = const(i)
         if (constlogic):
-            i+=1
             i, arg2logic = arg2(i)
             if (arg2logic):
                 return i, True
@@ -1379,7 +1418,7 @@ def arg(i):
         else:
             return i, False
     else:
-        return i-1, True        
+        return i, True        
 
 def display(i):
     if (TS[i][0] == "print"):
@@ -1388,11 +1427,10 @@ def display(i):
             i+=1
             i, arglogic = arg(i)
             if (arglogic):
-                i+=1
                 if (TS[i][0] == "CRB"):
                     i+=1
                     if (TS[i][0] == ";"):
-                        return i, True
+                        return i+1, True
                     else:
                         print("Error, expected ; at ", TS[i][1], " in line number ", TS[i][2])
                         return i, False
@@ -1442,7 +1480,6 @@ def extract(i):
         if (TS[i][0] == "ID"):
             i, varlogic = var_list(i)
             if (varlogic):
-                i+=1
                 if (TS[i][0] == "SAO"):
                     i+=1
                     if (TS[i][0] == "extract"):
@@ -1450,7 +1487,7 @@ def extract(i):
                         if (TS[i][0] == "ID"):
                             i+=1
                             if (TS[i][0] == ";"):
-                                return i, True
+                                return i+1, True
                             else:
                                 print("Error, expected a ; at ", TS[i][1], " in line number ", TS[i][2])
                                 return i, False
@@ -1507,7 +1544,7 @@ def argscomp(i):
             print("Error, expected an identifer at ", TS[i][1], " in line number ", TS[i][2])
             return i, False
     else:
-        return i-1, True
+        return i, True
 
 def func_def(i):
     if (TS[i][0] == "def"):
@@ -1520,16 +1557,14 @@ def func_def(i):
                     i+=1
                     i, argscomp_logic = argscomp(i)
                     if (argscomp_logic):
-                        i+=1
                         if (TS[i][0] == "CRB"):
                             i+=1
                             if (TS[i][0] == "OCB"):
                                 i+=1
                                 i, bodylogic = Body(i)
                                 if (bodylogic):
-                                    i+=1
                                     if (TS[i][0] == "CCB"):
-                                        return i, True
+                                        return i+1, True
                                     else:
                                         print("Error, expected a } at ", TS[i][1], " in line number ", TS[i][2])
                                         return i, False
@@ -1571,9 +1606,8 @@ def F2(i):
         if (TS[i][0]=="ID" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST" or TS[i][0] == "ORB" or TS[i][0] == "not"):
             i, OElogic = OE(i)
             if(OElogic):
-                i+=1
                 if (TS[i][0]=="CRB"):
-                    return i, True
+                    return i+1, True
     elif (TS[i][0]=="not"):
         i+=1
         if(TS[i][0] == "not" or TS[i][0] == "ID" or TS[i][0] == "ORB" or TS[i][0] == "INTCONST" or TS[i][0] == "FLTCONST" or TS[i][0] == "TEXTCONST" or TS[i][0] == "CHRCONST" or TS[i][0] == "LOGICCONST"):
@@ -1595,7 +1629,6 @@ def MDM2comp(i):
         i+=1
         i, F2logic = F2(i)
         if (F2logic):
-            i+=1
             i, MDM2Clogic = MDM2comp(i)
             if (MDM2Clogic):
                 return i, True
@@ -1609,7 +1642,6 @@ def MDM2comp(i):
 def MDM2(i):
     i, F2logic = F2(i)
     if (F2logic):
-        i+=1
         i, MDM2Clogic = MDM2comp(i)
         if (MDM2Clogic):
             return i, True
@@ -1623,7 +1655,6 @@ def PM2comp(i):
         i+=1
         i, MDM2logic = MDM2(i)
         if (MDM2logic):
-            i+=1
             i, PM2Clogic = PM2comp(i)
             if (PM2Clogic):
                 return i, True
@@ -1637,7 +1668,6 @@ def PM2comp(i):
 def PM2(i):
     i, MDM2logic = MDM2(i)
     if (MDM2logic):
-        i+=1
         i, PM2Clogic = PM2comp(i)
         if (PM2Clogic):
             return i, True
@@ -1651,7 +1681,6 @@ def RE2comp(i):
         i+=1
         i, PM2logic = PM2(i)
         if (PM2logic):
-            i+=1
             i, RE2Clogic = RE2comp(i)
             if (RE2Clogic):
                 return i, True
@@ -1664,7 +1693,6 @@ def RE2comp(i):
 def RE2(i):
     i, PM2logic = PM2(i)
     if (PM2logic):
-        i+=1
         i, RE2Clogic = RE2comp(i)
         if (RE2Clogic):
             return i, True
@@ -1678,7 +1706,6 @@ def AE2comp(i):
         i+=1
         i, RE2logic = RE2(i)
         if (RE2logic):
-            i+=1
             i, AE2Clogic = AE2comp(i)
             if (AE2Clogic):
                 return i, True
@@ -1691,7 +1718,6 @@ def AE2comp(i):
 def AE2(i):
     i, RE2logic = RE2(i)
     if (RE2logic):
-        i+=1
         i, AE2Clogic = AE2comp(i)
         if (AE2Clogic):
             return i, True
@@ -1705,7 +1731,6 @@ def OE2comp(i):
         i+=1
         i, AE2logic = AE2(i)
         if (AE2logic):
-            i+=1
             i, OE2Clogic = OE2comp(i)
             if (OE2Clogic):
                 return i, True
@@ -1718,7 +1743,6 @@ def OE2comp(i):
 def OE2(i):
     i, AE2logic = AE2(i)
     if (AE2logic):
-        i+=1
         i, OE2Clogic = OE2comp(i)
         if (OE2Clogic):
             return i, True
@@ -1736,9 +1760,8 @@ def decl3(i):
             return i, False
     i, OE2logic = OE2(i)
     if (OE2logic):
-        i+=1
         if (TS[i][0] == ";"):
-            return i, True
+            return i+1, True
         else:
             print("Error, expected ; at ", TS[i][1], " in line number ", TS[i][2]) 
             return i, False
@@ -1790,14 +1813,14 @@ def ID3(i):
         else:
             print("Error, expected \"dict_of\" or \"take\" or an identifier at ", TS[i][1], " in line number ", TS[i][2])
             return i, False
-    if(TS[i][0]=="OSB" and TS[i+3][0]=="SAO"):
+    if(TS[i][0]=="OSB" and (TS[i+3][0]=="SAO" or TS[i+6][0]=="SAO")):
         i, listlogic = list_decl(i)
         if (listlogic):
             return i, True
         else:
             return i, False
     if(TS[i][0]=="dot" or TS[i][0]=="OSB" or TS[i][0]=="SAO" or TS[i][0]=="CAO"):
-        print(TS[i][0])
+        #print(TS[i][0])
         i, assignlogic = assign(i)
         if (assignlogic):
             return i, True
@@ -1850,7 +1873,6 @@ def SST(i):
     elif (TS[i][1]=="given"):
         i, if_logic = if_func(i)
         if (if_logic):
-            i+=1
             i, elselogic = else_st(i)
             if (elselogic):
                 return i, True
@@ -1917,7 +1939,6 @@ def MST(i):
     if (TS[i][0]=="ID" or TS[i][0]=="DT" or TS[i][0]=="conditional" or TS[i][0]=="for" or TS[i][0]=="return" or TS[i][0]=="try" or TS[i][0]=="def" or TS[i][0]=="extract" or TS[i][0]=="print" or TS[i][0]=="import"):
         i, SSTlogic = SST(i)
         if (SSTlogic):
-            i+=1
             i, MSTlogic = MST(i)
             if (MSTlogic):
                 return i, True
@@ -1926,7 +1947,7 @@ def MST(i):
         else:
             return i, False
     else:
-        return i-1, True
+        return i, True
 
 def Body(i):
     if (TS[i][0]=="ID" or TS[i][0]=="DT" or TS[i][0]=="conditional" or TS[i][0]=="for" or TS[i][0]=="return" or TS[i][0]=="try" or TS[i][0]=="def" or TS[i][0]=="extract" or TS[i][0]=="print" or TS[i][0]=="import"):
@@ -1960,16 +1981,14 @@ def constr(i):
                         i+=1
                         i, argsClogic = argscomp(i)
                         if (argsClogic):
-                            i+=1
                             if (TS[i][0] == "CRB"):
                                 i+=1
                                 if (TS[i][0] == "OCB"):
                                     i+=1
                                     i, MSTlogic = MST(i)
                                     if (MSTlogic):
-                                        i+=1
                                         if (TS[i][0] == "CCB"):
-                                            return i, True
+                                            return i+1, True
                                         else:
                                             print("Error, expected a } at ", TS[i][1], " in line number ", TS[i][2])
                                             return i, False
@@ -2002,7 +2021,6 @@ def AOM(i):
         if (TS[i][0] == "DT"):
             i, declLogic = Decl(i)
             if (declLogic):
-                i+=1
                 i, AOMlogic = AOM(i)
                 if (AOMlogic):
                     return i, True
@@ -2013,7 +2031,6 @@ def AOM(i):
         elif (TS[i][0] == "def"):
             i, funcLogic = func_def(i)
             if(funcLogic):
-                i+=1
                 i, AOMlogic = AOM(i)
                 if(AOMlogic):
                     return i, True
@@ -2024,7 +2041,6 @@ def AOM(i):
         elif (TS[i][0] == "init"):
             i, constrLogic = constr(i)
             if (constrLogic):
-                i+=1
                 i, AOMlogic = AOM(i)
                 if(AOMlogic):
                     return i, True
@@ -2033,20 +2049,19 @@ def AOM(i):
             else:
                 return i, False
         else:
-            return i-1, True
+            return i, True
     else:
-        return i-1, True
+        return i, True
 
 def seal(i):
     if (TS[i][0] == "sealed"):
-        return i, True
+        return i+1, True
     else:
         return i, True
         
 def class_decl(i):
     i, seallogic = seal(i)
     if (seallogic):
-        i+=1
         if (TS[i][0] == "class"):
             i+=1
             if (TS[i][0] == "ID"):
@@ -2055,9 +2070,8 @@ def class_decl(i):
                     i+=1
                     i, AOMlogic = AOM(i)
                     if(AOMlogic):
-                        i+=1
                         if (TS[i][0] == "CCB"):
-                            return i, True
+                            return i + 1, True
                         else:
                             print("Error, expected a }  at ", TS[i][1], " in line number ", TS[i][2])
                             return i, False
@@ -2094,9 +2108,8 @@ def inhert(i):
                                     i+=1
                                     i, AOMlogic = AOM(i)
                                     if(AOMlogic):
-                                        i += 1
                                         if (TS[i][0] == "CCB"):
-                                            return i, True
+                                            return i + 1, True
                                         else:
                                             print("Error, expected } at ", TS[i][1], " in line number ", TS[i][2])
                                             return i, False
@@ -2129,16 +2142,16 @@ def inhert(i):
 
 def S(i):
     if (TS[i][0] == "$"):
-        return i, True
+        return i+1, True
     
     if (TS[i][0] == "class"):
         i+=1
         if (TS[i][0] == "ID"):
             i+=1
             if (TS[i][0] == "ORB"):
+                i+=1
                 i, inhertLogic = inhert(i-2)
                 if (inhertLogic):
-                    i+=1
                     i, Slogic = S(i)
                     if (Slogic):
                         return i, True
@@ -2149,7 +2162,6 @@ def S(i):
             else:
                 i, classLogic = class_decl(i-2)
                 if (classLogic):
-                    i+=1
                     i, Slogic = S(i)
                     if (Slogic):
                         return i, True
@@ -2160,9 +2172,9 @@ def S(i):
         else:
             return i, False
     elif(TS[i][0] == "sealed"):
+        i+=1
         i, classLogic = class_decl(i)
         if (classLogic):
-            i+=1
             i, Slogic = S(i)
             if (Slogic):
                 return i, True
@@ -2174,7 +2186,6 @@ def S(i):
     else:
         i, SSTlogic = SST(i)
         if (SSTlogic):
-            i+=1
             i, Slogic = S(i)
             return i, Slogic
         else:

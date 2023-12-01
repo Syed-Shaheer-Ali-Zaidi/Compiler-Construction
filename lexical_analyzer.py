@@ -148,12 +148,11 @@ def breakWords(code):
                 else:
                     word, i, current_token = generateToken(word, line, i)
                     tokenList.append(current_token)
-                    i -= 1
 
             if (i <= len(code)):
                 # If the character succeeding dot is a number then dot is included in word
-                checking = code[i+1]
-                if (code[i+1].isnumeric()):
+                checking = code[i]
+                if (code[i].isnumeric()):
                     word = word + code[i]
                     i += 1
                 # If character following dot is not a number then the dot is a separate word
@@ -161,6 +160,7 @@ def breakWords(code):
                     word = word + code[i]
                     word, i, current_token = generateToken(word, line, i)
                     tokenList.append(current_token)
+                    i+=1
 
             continue
         # checking for string

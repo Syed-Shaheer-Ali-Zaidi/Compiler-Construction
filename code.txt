@@ -1,1 +1,1 @@
-abc [5] = list_of [list_of[apple, bannana , cherry], hunny]; $
+sealed classy name {int a; doing int fn(){}} $
