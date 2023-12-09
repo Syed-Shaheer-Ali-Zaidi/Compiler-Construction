@@ -880,8 +880,10 @@ def OEcomp(i):
         return i, True
 
 
-def map_decl(i):
+def map_decl(i, N):
     if (TS[i][0] == "map"):
+        T = TS[i][0]
+        insertST(N, T, stack[-1], i)
         i+=1
         if (TS[i][0] == "OCB"):
             i+=1
