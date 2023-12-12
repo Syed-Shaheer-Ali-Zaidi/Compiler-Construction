@@ -25,25 +25,25 @@ def insertST (N,T,S):
             print("ST Redeclaration at line ", TS[i][2])
             return False
     
-def insertDT (N, T, AM, CM, P):
+def insertDT (N, AM, CM, P):
     if(lookupDT(N)==False):
-        DT.append([N, T, AM, CM, P])
+        DT.append([N, AM, CM, P])
         return True
     else:
         print("DT Redeclaration at line ", TS[i][2])
         return False
     
-def insertMT (N, T, AM, TM, const, CN):
+def insertMT (N, T, AM, const, CN):
     if(len(T)>5):
         if(lookupFuncMT(N, CN)==False):
-            MT.append([N, T, AM, TM, const, CN])
+            MT.append([N, T, AM, const, CN])
             return True
         else:
             print("MT Function Redeclaration at line ", TS[i][2])
             return False
     else:
         if(lookupMT(N, CN)==False):
-            MT.append([N, T, AM, TM, const, CN])
+            MT.append([N, T, AM, const, CN])
             return True
         else:
             print("MT Redeclaration at line ", TS[i][2])
@@ -234,6 +234,12 @@ def Compatibility(OP, LOT, ROT):
     ('and', 'logic', 'logic'): 'logic',       # True and True
 
     ('or', 'logic', 'logic'): 'logic',       # True or True
+
+    ('=', 'int', 'int'): 'logic',      # 1 == 1
+    ('=', 'flt', 'flt'): 'logic',      # 1.1 == 1.2
+    ('=', 'logic', 'logic'): 'logic',   # True / True
+    ('=', 'char', 'char'): 'logic',       # 1.1 / True
+    ('=', 'text', 'text'): 'logic',       # 1.1 / True
     
     }
 
